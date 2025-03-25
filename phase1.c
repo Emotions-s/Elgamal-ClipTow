@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int32_t gcd(int32_t a, int32_t b)
+int64_t gcd(int64_t a, int64_t b)
 {
     if (b == 0)
     {
@@ -11,7 +11,7 @@ int32_t gcd(int32_t a, int32_t b)
     return gcd(b, a % b);
 }
 
-int32_t extended_gcd(int32_t a, int32_t b, int32_t *x, int32_t *y)
+int64_t extended_gcd(int64_t a, int64_t b, int64_t *x, int64_t *y)
 {
     if (b == 0)
     {
@@ -20,8 +20,8 @@ int32_t extended_gcd(int32_t a, int32_t b, int32_t *x, int32_t *y)
         return a;
     }
 
-    int32_t x1, y1;
-    int32_t gcd = extended_gcd(b, a % b, &x1, &y1);
+    int64_t x1, y1;
+    int64_t gcd = extended_gcd(b, a % b, &x1, &y1);
 
     *x = y1;
     *y = x1 - (a / b) * y1;
@@ -29,10 +29,10 @@ int32_t extended_gcd(int32_t a, int32_t b, int32_t *x, int32_t *y)
     return gcd;
 }
 
-int32_t mod_inverse(int32_t a, int32_t m)
+int64_t mod_inverse(int64_t a, int64_t m)
 {
-    int32_t x, y;
-    int32_t g = extended_gcd(a, m, &x, &y);
+    int64_t x, y;
+    int64_t g = extended_gcd(a, m, &x, &y);
     if (g != 1)
     {
         return -1;
@@ -40,43 +40,41 @@ int32_t mod_inverse(int32_t a, int32_t m)
     return (x % m + m) % m;
 }
 
-int32_t fast_expo(int32_t base, int32_t exp, int32_t mod)
+int64_t fast_expo(int64_t base, int64_t exp, int64_t mod)
 {
     int64_t result = 1;
-    int64_t base64 = base;
-    int64_t mod64 = mod;
-    base64 %= mod;
+    base %= mod;
     while (exp > 0)
     {
         if (exp & 1)
         {
-            result = (result * base64) % mod64;
+            result = (result * base) % mod;
         }
-        base64 = (base64 * base64) % mod64;
+        base = (base * base) % mod;
         exp /= 2;
     }
-    return (int32_t)result;
+    return result;
 }
 
-int is_prime_lehmen(int32_t n, int32_t tries)
+int is_prime_lehmen(int64_t n, int64_t tries)
 {
     if (n < 2)
         return 0;
     if (n == 2)
         return 1;
 
-    for (int32_t i = 0; i < tries; i++)
+    for (int64_t i = 0; i < tries; i++)
     {
-        int32_t a = (rand() % (n - 3)) + 2;
-        int32_t e = (n - 1) / 2;
-        int32_t result = fast_expo(a, e, n);
+        int64_t a = (rand() % (n - 3)) + 2;
+        int64_t e = (n - 1) / 2;
+        int64_t result = fast_expo(a, e, n);
         if (result != 1 && result != n - 1)
             return 0;
     }
     return 1;
 }
 
-int is_prime(int32_t n)
+int is_prime(int64_t n)
 {
     long small_primes[] = {2, 3, 5, 7, 11, 13, 17, 19};
     for (int i = 0; i < (int)(sizeof(small_primes) / sizeof(small_primes[0])); i++)
@@ -89,7 +87,28 @@ int is_prime(int32_t n)
     return is_prime_lehmen(n, 100);
 }
 
-int32_t get_bits_from_file(int n, const char *filename)
+int is_safe_prime(int64_t p)
+{
+    int64_t p1 = (p - 1) / 2;
+    ;
+    return is_prime(p1);
+}
+
+int64_t find_primitive_root(int64_t p)
+{
+    int64_t p1 = (p - 1) / 2;
+    for (int64_t a = 2; a < p - 1; a++)
+    {
+        if (fast_expo(a, p1, p) != 1)
+        {
+            return a;
+        }
+    }
+
+    return -1;
+}
+
+int64_t get_bits_from_file(int n, const char *filename)
 {
     FILE *file = fopen(filename, "rb");
     if (!file)
@@ -98,7 +117,7 @@ int32_t get_bits_from_file(int n, const char *filename)
         exit(1);
     }
 
-    uint32_t result = 0;
+    uint64_t result = 0;
     int bits_collected = 0;
     int found = 0;
     int byte;
@@ -149,31 +168,35 @@ int32_t get_bits_from_file(int n, const char *filename)
         exit(1);
     }
 
-    return (int32_t)result;
+    return (int64_t)result;
 }
 
-int32_t gen_prime(int n, const char *filename)
+int64_t gen_prime(int n, const char *filename)
 {
-    int32_t lower_bound = 1ULL << (n - 1);
-    int32_t upper_bound = (1ULL << n) - 1;
+    int64_t lower_bound = 1ULL << (n - 1);
+    int64_t upper_bound = (1ULL << n) - 1;
 
-    int32_t first_candidate = get_bits_from_file(n, filename);
+    int64_t first_candidate = get_bits_from_file(n, filename);
     if ((first_candidate % 2) == 0)
     {
         first_candidate++;
     }
-    int32_t cur_candidate = first_candidate;
+    int64_t cur_candidate = first_candidate;
     while (cur_candidate <= upper_bound)
     {
         if (is_prime(cur_candidate))
-            return cur_candidate;
+        {
+            if (is_safe_prime(cur_candidate))
+                return cur_candidate;
+        }
 
         cur_candidate += 2;
     }
     while (cur_candidate >= lower_bound)
     {
         if (is_prime(cur_candidate))
-            return cur_candidate;
+            if (is_safe_prime(cur_candidate))
+                return cur_candidate;
 
         cur_candidate -= 2;
     }
@@ -195,9 +218,12 @@ void gen_random_with_inverse(int n)
     printf("Enter the filename: ");
     scanf("%99s", &filename);
     printf("filename: %s\n", filename);
-    int32_t p = gen_prime(bits, filename);
-    int32_t q = mod_inverse(p, n);
+    int64_t p = gen_prime(bits, filename);
+    int64_t q = mod_inverse(p, n);
     printf("prime  %d\n", p);
+    printf("safe prime %d\n", (p - 1) / 2);
     printf("inverse %d\n", q);
-    printf("%d * %d = 1 mod %d", p, q, n);
+    printf("%d * %d = 1 mod %d\n", p, q, n);
+    int primitive_root = find_primitive_root(p);
+    printf("Primitive root: %d\n", primitive_root);
 }

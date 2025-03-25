@@ -1,9 +1,9 @@
 #include <stdint.h>
 
-int32_t gcd(int32_t a, int32_t b);
-int32_t extended_gcd(int32_t a, int32_t b, int32_t *x, int32_t *y);
-int32_t mod_inverse(int32_t a, int32_t m);
-int32_t fast_expo(int32_t a, int32_t b, int32_t n);
-int is_prime_lehmen(int32_t n, int32_t tries);
-int32_t gen_prime(int32_t n, const char *filename);
+int64_t gcd(int64_t a, int64_t b);
+int64_t extended_gcd(int64_t a, int64_t b, int64_t *x, int64_t *y);
+int64_t mod_inverse(int64_t a, int64_t m);
+int64_t fast_expo(int64_t a, int64_t b, int64_t n);
+int is_prime_lehmen(int64_t n, int64_t tries);
+int64_t gen_prime(int64_t n, const char *filename);
 void gen_random_with_inverse(int n);
