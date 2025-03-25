@@ -6,9 +6,8 @@
 
 int main()
 {
-    int n;
-    printf("Enter n: ");
-    scanf("%d", &n);
-    printf("%d\n", gen_random_with_inverse(n));
+
+    int n = 71;
+    gen_random_with_inverse(n);
     return 0;
 }

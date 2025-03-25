@@ -181,17 +181,23 @@ int32_t gen_prime(int n, const char *filename)
     fprintf(stderr, "Failed to generate prime within %d-bit range %d %x\n", n, first_candidate, first_candidate);
     exit(1);
 }
-int32_t gen_random_with_inverse(int n)
+void gen_random_with_inverse(int n)
 {
-    if (n < 2 || n > 31)
+    char filename[100];
+    int bits;
+    printf("Enter number of bis [2, 31]: ");
+    scanf("%d", &bits);
+    if (bits < 2 || bits > 31)
     {
         fprintf(stderr, "Invalid bit length (must be 2–63)\n");
         exit(1);
     }
-    char filename[100];
-
     printf("Enter the filename: ");
     scanf("%99s", &filename);
     printf("filename: %s\n", filename);
-    return gen_prime(n, filename);
+    int32_t p = gen_prime(bits, filename);
+    int32_t q = mod_inverse(p, n);
+    printf("prime  %d\n", p);
+    printf("inverse %d\n", q);
+    printf("%d * %d = 1 mod %d", p, q, n);
 }
