@@ -12,7 +12,7 @@ PROGRAMS = receiver sender prime sign verify
 
 receiver_SRCS = receiver.c elgamal_encrypt.c elgamal_utils.c key_io.c data_io.c
 sender_SRCS   = sender.c elgamal_encrypt.c elgamal_utils.c key_io.c data_io.c
-prime_SRCS    = prime.c elgamal_utils.c
+prime_SRCS    = prime.c elgamal_utils.c elgamal_encrypt.c key_io.c data_io.c
 signature_SRCS = sign.c elgamal_signature.c elgamal_utils.c key_io.c
 verify_SRCS  = verify.c elgamal_signature.c elgamal_utils.c key_io.c
 

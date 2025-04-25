@@ -30,26 +30,11 @@ int main()
     BN_CTX *ctx = BN_CTX_new();
     BN_CTX_start(ctx);
 
-    BIGNUM *x = BN_CTX_get(ctx);
     BIGNUM *p = BN_CTX_get(ctx);
     BIGNUM *g = BN_CTX_get(ctx);
     BIGNUM *y = BN_CTX_get(ctx);
 
-    int bits = 64;
-    char *rand_file = "genBin.sh";
-
-    if (!x || !p || !g || !y)
-    {
-        perror("Failed to allocate BIGNUMs");
-        return 1;
-    }
-
-    // Generate keys
-    elgamal_key_gen(x, p, g, y, bits, rand_file);
-
-    // Save keys to files
-    save_pri_key("keys/private_key.bin", x);
-    save_pub_key("keys/public_key.bin", p, g, y);
+    read_pub_key("keys/public_key.bin", &p, &g, &y);
 
     // Get user input for encryption type
     char input_type[10];

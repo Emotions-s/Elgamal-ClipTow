@@ -351,22 +351,22 @@ void gen_prime(BIGNUM *prime, int bits, const char *filename, BN_CTX *ctx)
     if (!BN_is_odd(cur))
         BN_add_word(cur, 1);
 
-    // int i = 0;
+    int i = 0;
     while (BN_cmp(cur, upper) <= 0)
     {
-        // if (i % 100 == 0)
-        // {
-        //     printf("Total: %d, checking: ", i);
-        //     BN_print_fp(stdout, cur);
-        //     printf("\n");
-        // }
+        if (i % 1000 == 0)
+        {
+            printf("Total: %d, checking: ", i);
+            BN_print_fp(stdout, cur);
+            printf("\n");
+        }
         if (is_prime(cur, ctx) && is_safe_prime(cur, ctx))
         {
             BN_copy(prime, cur);
             break;
         }
         BN_add_word(cur, 2);
-        // i++;
+        i++;
     }
 
     BN_free(lower);
